@@ -32,18 +32,41 @@ class Executor:
     def __init__(self):
         self._sqlite_engine_cache = Cache()
 
-    def get_database_objects(self, connection_url):
+    def get_schema_objects(self, connection_url):
         if is_mysql(connection_url) and not has_database(connection_url):
             raise InvalidConnectionUrl(
-                "You need to specify a database name in the connection "
-                "URL for MySQL databases. Use, for instance, "
-                "`mysql://localhost/employees`."
+              "You need to specify a database name in the connection "
+              "URL for MySQL databases. Use, for instance, "
+              "`mysql://localhost/employees`."
             )
         engine = self._get_engine(connection_url)
         inspector = inspect(engine)
+        schema_objects = inspector.get_schema_names()
+        return schema_objects
+
+    def get_database_objects(self, connection_url):
+        if is_mysql(connection_url) and not has_database(connection_url):
+            raise InvalidConnectionUrl(
+              "You need to specify a database name in the connection "
+              "URL for MySQL databases. Use, for instance, "
+              "`mysql://localhost/employees`."
+            )
+        engine = self._get_engine(connection_url)
+        inspector = inspect(engine)
+        tables = []
+        views = []
+        try:
+            tables = inspector.get_table_names()
+        except Exception as e:
+            print(e)
+        try:
+            views = inspector.get_view_names()
+        except Exception as e:
+            print(e)
+
         database_objects = DatabaseObjects(
-            tables=inspector.get_table_names(),
-            views=inspector.get_view_names(),
+          tables=tables,
+          views=views,
         )
         return database_objects
 
@@ -59,8 +82,8 @@ class Executor:
     def _get_engine(self, connection_url):
         if is_sqlite(connection_url):
             engine = self._sqlite_engine_cache.get_or_set(
-                connection_url,
-                lambda: self._create_sqlite_engine(connection_url),
+              connection_url,
+              lambda: self._create_sqlite_engine(connection_url),
             )
         else:
             engine = create_engine(connection_url)
@@ -68,15 +91,15 @@ class Executor:
 
     def _create_sqlite_engine(self, connection_url):
         engine = create_engine(
-            connection_url,
-            connect_args={"check_same_thread": False},
-            poolclass=StaticPool,
+          connection_url,
+          connect_args={"check_same_thread": False},
+          poolclass=StaticPool,
         )
         return engine
 
     def _execute_with_engine(self, engine, query):
         connection = engine.connect()
         result = connection.execution_options(no_parameters=True).execute(
-            query
+          query
         )
         return result

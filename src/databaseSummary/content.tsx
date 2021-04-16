@@ -15,9 +15,10 @@ export interface DatabaseSummaryIModel extends IDisposable {
 
 export class DatabaseSummaryModel extends VDomModel
   implements DatabaseSummaryIModel {
-  constructor(tables: Array<string>) {
+  constructor(tables: Array<string>, views: Array<string>) {
     super();
     this.tables = tables;
+    this.views = views;
     this.onNavigateToTable = this.onNavigateToTable.bind(this);
     this.onNavigateToCustomQuery = this.onNavigateToCustomQuery.bind(this);
   }
@@ -39,6 +40,7 @@ export class DatabaseSummaryModel extends VDomModel
   }
 
   readonly tables: Array<string>;
+  readonly views: Array<string>;
   private readonly _navigateToTable = new Signal<this, string>(this);
   private readonly _navigateToCustomQuery = new Signal<this, void>(this);
 }
@@ -59,10 +61,11 @@ export class DatabaseSummaryWidget extends VDomRenderer<DatabaseSummaryModel> {
     if (!this.model) {
       return null;
     } else {
-      const { tables, onNavigateToTable, onNavigateToCustomQuery } = this.model;
+      const { tables, views, onNavigateToTable, onNavigateToCustomQuery } = this.model;
       return (
         <TableList
           tableNames={tables}
+          viewNames={views}
           onNavigateToTable={onNavigateToTable}
           onNavigateToCustomQuery={onNavigateToCustomQuery}
         />
@@ -74,6 +77,7 @@ export class DatabaseSummaryWidget extends VDomRenderer<DatabaseSummaryModel> {
 namespace TableList {
   export interface Props {
     tableNames: Array<string>;
+    viewNames: Array<string>;
     onNavigateToTable: (tableName: string) => void;
     onNavigateToCustomQuery: () => void;
   }
@@ -99,6 +103,7 @@ class TableList extends React.Component<TableList.Props, TableList.State> {
   render() {
     const {
       tableNames,
+      viewNames,
       onNavigateToTable,
       onNavigateToCustomQuery
     } = this.props;
@@ -112,6 +117,15 @@ class TableList extends React.Component<TableList.Props, TableList.State> {
         selected={i === selectedItem}
       />
     ));
+    const viewItems = viewNames.map((viewName, i) => (
+        <TableListItem
+            tableName={viewName}
+            key={tableItems.length + i}
+            onClick={() => this.onTableItemClick(tableItems.length + i)}
+            onDoubleClick={() => onNavigateToTable(viewName)}
+            selected={tableItems.length + i === selectedItem}
+        />
+    ));
     return (
       <div className="p-Sql-TableList-container">
         <ul className="p-Sql-TableList-content">
@@ -119,6 +133,12 @@ class TableList extends React.Component<TableList.Props, TableList.State> {
           <CustomQueryItem onClick={onNavigateToCustomQuery} />
           <ListHeader headerText="Tables" />
           {tableItems}
+          {viewItems.length > 0 && (
+              <div>
+                <ListHeader headerText="Views" />
+                {viewItems}
+              </div>
+          )}
         </ul>
       </div>
     );

@@ -55,7 +55,7 @@ function activate(
       const name = <string>(initialWidgetName || uuid.v4());
       const pageName = <PageName>(initialPageName || PageName.Connection);
       const connectionUrl = <string>(
-        (initialConnectionUrl || 'postgres://localhost:5432/postgres')
+        (initialConnectionUrl || 'hive://localhost:10000')
       );
       const tableName = <string>(initialTableName || '');
       const sqlStatement = <string>(initialSqlStatement || '');

@@ -14,5 +14,6 @@ export enum PageName {
   Connection,
   DatabaseSummary,
   TableSummary,
-  CustomQuery
+  CustomQuery,
+  SchemaSummary
 }

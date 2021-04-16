@@ -39,8 +39,9 @@ class SqlQueryHandler(IPythonHandler):
                     None, self.execute_query, connection_url, query
                 )
                 if result.has_rows:
+                    keys = [row for row in result.keys]
                     response = responses.success_with_rows(
-                        result.keys, result.rows
+                        keys, result.rows
                     )
                 else:
                     response = responses.success_no_rows()
@@ -83,6 +84,40 @@ class StructureHandler(IPythonHandler):
             return self.finish(json.dumps(response))
 
 
+class SchemaStructureHandler(IPythonHandler):
+    def initialize(self, executor):
+        self._executor = executor
+        self._validator = schema_loader.load("schema-structure.json")
+
+    def get_schema_objects(self, connection_url):
+        result = self._executor.get_schema_objects(connection_url)
+        return result
+
+    @contextmanager
+    def decoded_request(self):
+        try:
+            data = request_decoder.decode(self.request.body, self._validator)
+            connection_url = data["connectionUrl"]
+            yield connection_url
+        except request_decoder.RequestDecodeError as e:
+            response = responses.error(str(e))
+            return self.finish(json.dumps(response))
+
+    async def post(self):
+        with self.decoded_request() as connection_url:
+            ioloop = tornado.ioloop.IOLoop.current()
+            try:
+                schema_objects = await ioloop.run_in_executor(
+                    None, self._executor.get_schema_objects, connection_url
+                )
+                response = responses.success_with_schema_objects(
+                    schema_objects
+                )
+            except Exception as e:
+                response = responses.error(str(e))
+            return self.finish(json.dumps(response))
+
+
 class TableStructureHandler(IPythonHandler):
     def initialize(self, executor):
         self._executor = executor
@@ -110,11 +145,13 @@ class TableStructureHandler(IPythonHandler):
                 result = await ioloop.run_in_executor(
                     None, self.get_table_summary, connection_url, table_name
                 )
+                keys = [row for row in result.keys]
                 response = responses.success_with_rows(
-                    result.keys, result.rows
+                    keys, result.rows
                 )
             except Exception as e:
                 response = responses.error(str(e))
+            print(response)
             self.finish(json.dumps(response))
 
 
@@ -142,6 +179,11 @@ def register_handlers(nbapp):
         (
             form_route(web_app, "table"),
             TableStructureHandler,
+            {"executor": executor},
+        ),
+        (
+            form_route(web_app, "schema"),
+            SchemaStructureHandler,
             {"executor": executor},
         ),
     ]

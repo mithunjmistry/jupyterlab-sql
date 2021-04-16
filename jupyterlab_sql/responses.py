@@ -23,3 +23,11 @@ def success_with_database_objects(database_objects):
     }
     response = {"responseType": "success", "responseData": response_data}
     return response
+
+
+def success_with_schema_objects(schema_objects):
+    response_data = {
+        "schemas": schema_objects
+    }
+    response = {"responseType": "success", "responseData": response_data}
+    return response

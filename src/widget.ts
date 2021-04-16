@@ -1,22 +1,24 @@
-import { Widget, BoxLayout } from '@phosphor/widgets';
+import {BoxLayout, Widget} from '@phosphor/widgets';
 
-import { ISignal, Signal } from '@phosphor/signaling';
+import {ISignal, Signal} from '@phosphor/signaling';
 
-import { IEditorFactoryService } from '@jupyterlab/codeeditor';
+import {IEditorFactoryService} from '@jupyterlab/codeeditor';
 
-import { Toolbar } from '@jupyterlab/apputils';
+import {Toolbar} from '@jupyterlab/apputils';
 
-import { SingletonPanel } from './components';
+import {SingletonPanel} from './components';
 
-import { QueryPage } from './query';
+import {QueryPage} from './query';
 
-import { ConnectionPage } from './connection';
+import {ConnectionPage} from './connection';
 
-import { DatabaseSummaryPage } from './databaseSummary';
+import {DatabaseSummaryPage} from './databaseSummary';
 
-import { TableSummaryPage } from './tableSummary';
+import {SchemaSummaryPage} from './schemaSummary';
 
-import { JupyterLabSqlPage, PageName } from './page';
+import {TableSummaryPage} from './tableSummary';
+
+import {JupyterLabSqlPage, PageName} from './page';
 
 namespace JupyterLabSqlWidget {
   export interface IOptions {
@@ -107,6 +109,8 @@ export class JupyterLabSqlWidget extends Widget {
       this._loadSummaryPage();
     } else if (this.pageName === PageName.TableSummary) {
       this._loadTableSummaryPage();
+    } else if (this.pageName === PageName.SchemaSummary) {
+      this._loadSchemaSummaryPage();
     } else {
       this._loadQueryPage();
     }
@@ -154,6 +158,14 @@ export class JupyterLabSqlWidget extends Widget {
     }
   }
 
+  private _connectionToNextPageHelper(): boolean {
+    const connectionUrl = this._connectionUrl;
+    if (connectionUrl === 'hive://localhost:10000') {
+      return true;
+    }
+    return false;
+  }
+
   private _loadConnectionPage(): void {
     const initialConnectionString = this._connectionUrl;
     const page = new ConnectionPage({
@@ -161,7 +173,12 @@ export class JupyterLabSqlWidget extends Widget {
     });
     page.connectDatabase.connect((_, connectionUrl) => {
       this._setConnectionUrl(connectionUrl);
-      this._loadSummaryPage();
+      const isSchemaRequest = this._connectionToNextPageHelper();
+      if (isSchemaRequest) {
+        this._loadSchemaSummaryPage();
+      } else {
+        this._loadSummaryPage();
+      }
     });
     page.connectionUrlChanged.connect((_, connectionUrl) => {
       this._setConnectionUrl(connectionUrl);
@@ -178,6 +195,28 @@ export class JupyterLabSqlWidget extends Widget {
     page.navigateToTable.connect((_, tableName) => {
       this._setTableName(tableName);
       this._loadTableSummaryPage();
+    });
+    page.navigateBack.connect(() => {
+      this._loadConnectionPage();
+    });
+    this.page = page;
+  }
+
+  private _navigateToDatabaseHelper(schemaName: string): string {
+    const connectionUrl: string = this._connectionUrl;
+    if (connectionUrl.startsWith("hive")) {
+      return `${connectionUrl}/${schemaName}`;
+    }
+    return connectionUrl;
+  }
+
+  private _loadSchemaSummaryPage() {
+    const connectionUrl: string = this._connectionUrl;
+    const page = new SchemaSummaryPage({ connectionUrl });
+    page.navigateToDatabase.connect((_, schemaName) => {
+      const newConnectionUrl = this._navigateToDatabaseHelper(schemaName);
+      this._setConnectionUrl(newConnectionUrl);
+      this._loadSummaryPage();
     });
     page.navigateBack.connect(() => {
       this._loadConnectionPage();
