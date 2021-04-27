@@ -11,6 +11,7 @@ import { VDomModel, VDomRenderer } from '@jupyterlab/apputils';
 export interface DatabaseSummaryIModel extends IDisposable {
   navigateToTable: ISignal<this, string>;
   navigateToCustomQuery: ISignal<this, void>;
+  navigateToQueryHistory: ISignal<this, void>;
 }
 
 export class DatabaseSummaryModel extends VDomModel
@@ -21,6 +22,7 @@ export class DatabaseSummaryModel extends VDomModel
     this.views = views;
     this.onNavigateToTable = this.onNavigateToTable.bind(this);
     this.onNavigateToCustomQuery = this.onNavigateToCustomQuery.bind(this);
+    this.onNavigateToQueryHistory = this.onNavigateToQueryHistory.bind(this);
   }
 
   get navigateToTable(): ISignal<this, string> {
@@ -31,6 +33,10 @@ export class DatabaseSummaryModel extends VDomModel
     return this._navigateToCustomQuery;
   }
 
+  get navigateToQueryHistory(): ISignal<this, void> {
+    return this._navigateToQueryHistory;
+  }
+
   onNavigateToTable(tableName: string) {
     this._navigateToTable.emit(tableName);
   }
@@ -39,10 +45,15 @@ export class DatabaseSummaryModel extends VDomModel
     this._navigateToCustomQuery.emit(void 0);
   }
 
+  onNavigateToQueryHistory() {
+    this._navigateToQueryHistory.emit(void 0);
+  }
+
   readonly tables: Array<string>;
   readonly views: Array<string>;
   private readonly _navigateToTable = new Signal<this, string>(this);
   private readonly _navigateToCustomQuery = new Signal<this, void>(this);
+  private readonly _navigateToQueryHistory = new Signal<this, void>(this);
 }
 
 export class DatabaseSummaryWidget extends VDomRenderer<DatabaseSummaryModel> {
@@ -61,13 +72,20 @@ export class DatabaseSummaryWidget extends VDomRenderer<DatabaseSummaryModel> {
     if (!this.model) {
       return null;
     } else {
-      const { tables, views, onNavigateToTable, onNavigateToCustomQuery } = this.model;
+      const {
+        tables,
+        views,
+        onNavigateToTable,
+        onNavigateToCustomQuery,
+        onNavigateToQueryHistory
+      } = this.model;
       return (
         <TableList
           tableNames={tables}
           viewNames={views}
           onNavigateToTable={onNavigateToTable}
           onNavigateToCustomQuery={onNavigateToCustomQuery}
+          onNavigateToQueryHistory={onNavigateToQueryHistory}
         />
       );
     }
@@ -80,6 +98,7 @@ namespace TableList {
     viewNames: Array<string>;
     onNavigateToTable: (tableName: string) => void;
     onNavigateToCustomQuery: () => void;
+    onNavigateToQueryHistory: () => void;
   }
 
   export interface State {
@@ -105,7 +124,8 @@ class TableList extends React.Component<TableList.Props, TableList.State> {
       tableNames,
       viewNames,
       onNavigateToTable,
-      onNavigateToCustomQuery
+      onNavigateToCustomQuery,
+      onNavigateToQueryHistory
     } = this.props;
     const { selectedItem } = this.state;
     const tableItems = tableNames.map((tableName, i) => (
@@ -131,6 +151,7 @@ class TableList extends React.Component<TableList.Props, TableList.State> {
         <ul className="p-Sql-TableList-content">
           <ListHeader headerText="Actions" />
           <CustomQueryItem onClick={onNavigateToCustomQuery} />
+          <QueryHistoryItem onClick={onNavigateToQueryHistory} />
           <ListHeader headerText="Tables" />
           {tableItems}
           {viewItems.length > 0 && (
@@ -192,6 +213,28 @@ class CustomQueryItem extends React.Component<CustomQueryItem.Props> {
         <span className="jp-DirListing-itemIcon jp-MaterialIcon jp-CodeConsoleIcon" />
         <span className="jp-DirListing-itemText">Custom SQL query</span>
       </li>
+    );
+  }
+}
+
+namespace QueryHistoryItem {
+  export interface Props {
+    onClick: () => void;
+  }
+}
+
+class QueryHistoryItem extends React.Component<QueryHistoryItem.Props> {
+  render() {
+    const { onClick } = this.props;
+    return (
+        <li
+            onClick={onClick}
+            className="jp-DirListing-item"
+            title="History"
+        >
+          <span className="jp-DirListing-itemIcon jp-MaterialIcon jp-CodeConsoleIcon" />
+          <span className="jp-DirListing-itemText">History</span>
+        </li>
     );
   }
 }

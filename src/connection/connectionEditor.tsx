@@ -72,7 +72,7 @@ export class ConnectionEditor extends VDomRenderer<ConnectionEditorModel> {
               this.model.tryConnect(currentConnectionUrl)
             }
           />
-          <ConnectionInformationHelper />
+          {/*<ConnectionInformationHelper />*/}
         </div>
       );
     }
@@ -141,6 +141,14 @@ class ConnectionInformationEdit extends React.Component<
     this.inputRef.current!.focus();
   }
 
+  oneClickConnect(connectionType: string) {
+    if (connectionType === 'presto') {
+      this.props.onFinishEdit('presto://localhost:8889/hive');
+    } else {
+      this.props.onFinishEdit('hive://localhost:10000');
+    }
+  }
+
   render() {
     const { connectionUrl, focused } = this.state;
     const inputWrapperClass = classNames(
@@ -149,12 +157,18 @@ class ConnectionInformationEdit extends React.Component<
     );
     return (
       <div className="p-Sql-ConnectionInformation-wrapper">
+        <div className='p-Sql-Tile' onClick={() => this.oneClickConnect('hive')}>
+          Hive
+        </div>
+        <div className='p-Sql-Tile' onClick={() => this.oneClickConnect('presto')}>
+          Presto
+        </div>
         <div className={inputWrapperClass}>
           <input
             className="p-Sql-ConnectionInformation-text p-Sql-ConnectionInformation-input"
             value={connectionUrl}
             ref={this.inputRef}
-            autoFocus={true}
+            autoFocus={false}
             onChange={event => this.onChange(event)}
             onKeyDown={event => this.onKeyDown(event)}
             onBlur={() => this.onInputBlur()}
@@ -179,42 +193,42 @@ namespace ConnectionInformationEdit {
   }
 }
 
-class ConnectionInformationHelper extends React.Component<{}> {
-  render() {
-    return (
-      <details className="jp-RenderedHTMLCommon">
-        <summary>Help</summary>
-        <p>
-          Press <code>Enter</code> to connect to the database.
-        </p>
-        <p>
-          The URL must be a database URL. Follow the{' '}
-          <a
-            href="https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls"
-            target="_blank"
-          >
-            SQLAlchemy guide
-          </a>{' '}
-          on URLs. For instance:
-        </p>
-        <ul>
-          <li>
-            <pre>postgres://localhost:5432/postgres</pre>
-          </li>
-          <li>
-            <pre>postgres://username:password@localhost:5432/postgres</pre>
-          </li>
-          <li>
-            <pre>mysql://localhost/employees</pre>
-          </li>
-          <li>
-            <pre>sqlite://</pre>
-          </li>
-          <li>
-            <pre>sqlite:///myfile.db</pre>
-          </li>
-        </ul>
-      </details>
-    );
-  }
-}
+// class ConnectionInformationHelper extends React.Component<{}> {
+//   render() {
+//     return (
+//       <details className="jp-RenderedHTMLCommon">
+//         <summary>Help</summary>
+//         <p>
+//           Press <code>Enter</code> to connect to the database.
+//         </p>
+//         <p>
+//           The URL must be a database URL. Follow the{' '}
+//           <a
+//             href="https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls"
+//             target="_blank"
+//           >
+//             SQLAlchemy guide
+//           </a>{' '}
+//           on URLs. For instance:
+//         </p>
+//         <ul>
+//           <li>
+//             <pre>postgres://localhost:5432/postgres</pre>
+//           </li>
+//           <li>
+//             <pre>postgres://username:password@localhost:5432/postgres</pre>
+//           </li>
+//           <li>
+//             <pre>mysql://localhost/employees</pre>
+//           </li>
+//           <li>
+//             <pre>sqlite://</pre>
+//           </li>
+//           <li>
+//             <pre>sqlite:///myfile.db</pre>
+//           </li>
+//         </ul>
+//       </details>
+//     );
+//   }
+// }

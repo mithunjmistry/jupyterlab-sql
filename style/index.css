@@ -11,6 +11,7 @@
 }
 
 .p-Sql-ConnectionInformation-wrapper {
+    flex-direction: column;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,6 +26,8 @@
     padding-left: 8px;
     padding-right: 8px;
     flex: 1 1 auto;
+    width: 300px;
+    margin: 7px;
 }
 
 .p-Sql-ConnectionInformation-input-wrapper.p-mod-focused {
@@ -109,4 +112,14 @@
 .jp-Toolbar-item.p-Sql-Toolbar-text {
     line-height: 24px;
     text-align: center;
+}
+
+.p-Sql-Tile {
+    padding: 15px 10px 10px;
+    width: 295px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    border: thin solid var(--jp-border-color0);
+    margin: 7px;
 }

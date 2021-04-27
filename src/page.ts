@@ -15,5 +15,6 @@ export enum PageName {
   DatabaseSummary,
   TableSummary,
   CustomQuery,
-  SchemaSummary
+  SchemaSummary,
+  QueryHistory
 }

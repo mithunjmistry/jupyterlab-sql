@@ -36,6 +36,7 @@ export class DatabaseSummaryPage implements JupyterLabSqlPage {
     this._navigateBack = proxyFor(this._toolbar.backButtonClicked, this);
     this._toolbar.refreshButtonClicked.connect(this._onRefresh);
     this._customQueryClicked = proxyFor(this._content.customQueryClicked, this);
+    this._queryHistoryClicked = proxyFor(this._content.queryHistoryClicked, this);
     this._navigateToTable = proxyFor(this._content.navigateToTable, this);
     this._disposables = DisposableSet.from([this._content, this._toolbar]);
 
@@ -56,6 +57,10 @@ export class DatabaseSummaryPage implements JupyterLabSqlPage {
 
   get customQueryClicked(): ISignal<this, void> {
     return this._customQueryClicked;
+  }
+
+  get queryHistoryClicked(): ISignal<this, void> {
+    return this._queryHistoryClicked;
   }
 
   get navigateToTable(): ISignal<this, string> {
@@ -82,6 +87,7 @@ export class DatabaseSummaryPage implements JupyterLabSqlPage {
   private readonly _content: Content;
   private readonly _navigateBack: Signal<this, void>;
   private readonly _customQueryClicked: Signal<this, void>;
+  private readonly _queryHistoryClicked: Signal<this, void>;
   private readonly _navigateToTable: Signal<this, string>;
 }
 
@@ -93,6 +99,10 @@ class Content extends SingletonPanel {
 
   get customQueryClicked(): ISignal<this, void> {
     return this._customQueryClicked;
+  }
+
+  get queryHistoryClicked(): ISignal<this, void> {
+    return this._queryHistoryClicked;
   }
 
   get navigateToTable(): ISignal<this, string> {
@@ -119,6 +129,9 @@ class Content extends SingletonPanel {
         model.navigateToCustomQuery.connect(() => {
           this._customQueryClicked.emit(void 0);
         });
+        model.navigateToQueryHistory.connect(() => {
+          this._queryHistoryClicked.emit(void 0);
+        });
         model.navigateToTable.connect((_, tableName) => {
           this._navigateToTable.emit(tableName);
         });
@@ -140,6 +153,10 @@ class Content extends SingletonPanel {
   private readonly _connectionUrl: string;
   private _databaseSummaryModel: DatabaseSummaryIModel | null;
   private readonly _customQueryClicked: Signal<this, void> = new Signal<
+    this,
+    void
+  >(this);
+  private readonly _queryHistoryClicked: Signal<this, void> = new Signal<
     this,
     void
   >(this);

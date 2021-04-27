@@ -70,6 +70,11 @@ class Executor:
         )
         return database_objects
 
+    def execute_metadata_query(self, connection_url, query):
+        engine = self._get_engine(connection_url)
+        result = self._execute_with_engine(engine, query)
+        return result.lastrowid
+
     def execute_query(self, connection_url, query):
         engine = self._get_engine(connection_url)
         result = self._execute_with_engine(engine, query)

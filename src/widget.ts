@@ -19,6 +19,7 @@ import {SchemaSummaryPage} from './schemaSummary';
 import {TableSummaryPage} from './tableSummary';
 
 import {JupyterLabSqlPage, PageName} from './page';
+import {QueryHistoryPage} from "./queryHistory";
 
 namespace JupyterLabSqlWidget {
   export interface IOptions {
@@ -160,10 +161,7 @@ export class JupyterLabSqlWidget extends Widget {
 
   private _connectionToNextPageHelper(): boolean {
     const connectionUrl = this._connectionUrl;
-    if (connectionUrl === 'hive://localhost:10000') {
-      return true;
-    }
-    return false;
+    return connectionUrl === 'hive://localhost:10000' || connectionUrl === 'presto://localhost:8889/hive';
   }
 
   private _loadConnectionPage(): void {
@@ -199,12 +197,15 @@ export class JupyterLabSqlWidget extends Widget {
     page.navigateBack.connect(() => {
       this._loadConnectionPage();
     });
+    page.queryHistoryClicked.connect(() => {
+      this._loadHistoryPage();
+    });
     this.page = page;
   }
 
   private _navigateToDatabaseHelper(schemaName: string): string {
     const connectionUrl: string = this._connectionUrl;
-    if (connectionUrl.startsWith("hive")) {
+    if (connectionUrl.startsWith("hive") || connectionUrl.startsWith("presto")) {
       return `${connectionUrl}/${schemaName}`;
     }
     return connectionUrl;
@@ -220,6 +221,17 @@ export class JupyterLabSqlWidget extends Widget {
     });
     page.navigateBack.connect(() => {
       this._loadConnectionPage();
+    });
+    this.page = page;
+  }
+
+  private _loadHistoryPage() {
+    const options = {
+      connectionUrl: this._connectionUrl
+    };
+    const page = new QueryHistoryPage(options);
+    page.backButtonClicked.connect(() => {
+      this._loadSummaryPage();
     });
     this.page = page;
   }
