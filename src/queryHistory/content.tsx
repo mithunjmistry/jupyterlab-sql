@@ -6,6 +6,10 @@ import * as History from '../api/history';
 
 import { VDomModel, VDomRenderer } from '@jupyterlab/apputils';
 
+import { format } from 'sql-formatter';
+
+import * as Api from '../api';
+
 export interface QueryHistoryIModel extends IDisposable {
 }
 
@@ -98,15 +102,52 @@ namespace QueryHistoryListItem {
 }
 
 class QueryHistoryListItem extends React.Component<QueryHistoryListItem.Props> {
+
+  constructor(props: QueryHistoryListItem.Props) {
+    super(props);
+    this.onQueryDownload = this.onQueryDownload.bind(this);
+  }
+
+  onQueryDownload(ts: number, downloadType: string) {
+    const fileName = `query_${ts}/query_${ts}.${downloadType}`;
+    Api.getQueryFile(fileName).then((blob) => {
+      let link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `query_${ts}.${downloadType}`;
+
+      document.body.appendChild(link);
+
+      link.click();
+      setTimeout(function () {
+        // @ts-ignore
+        window.URL.revokeObjectURL(link);
+      }, 200);
+    })
+  }
+
   render() {
     const { queryMetaData } = this.props;
-    const { query } = queryMetaData;
+    const { query, ts } = queryMetaData;
     return (
       <li
         title={query}
+        className={"p-Query-History-List-Item"}
       >
-        <span className="jp-DirListing-itemIcon jp-MaterialIcon jp-SpreadsheetIcon" />
-        <span className="jp-DirListing-itemText">{query}</span>
+        <div className={"p-Query-History-Container"}>
+          <div className={"p-Query-History-Margin"}>
+            {format(query, {language: 'spark'})}
+          </div>
+        </div>
+        <span
+            className="jp-DirListing-itemText p-Query-History-Download-Input"
+            onClick={() => this.onQueryDownload(ts, 'in')}
+        >Download Query
+        </span>
+        <span
+            className="jp-DirListing-itemText p-Query-History-Download-Output"
+            onClick={() => this.onQueryDownload(ts, 'out')}
+        >Download Query Output
+        </span>
       </li>
     );
   }

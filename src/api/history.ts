@@ -1,4 +1,4 @@
-import { Server } from './server';
+import {Server} from './server';
 
 export async function getQueryHistory(
   connectionUrl: string
@@ -15,6 +15,17 @@ export async function getQueryHistory(
   const data = await response.json();
   const validatedData = Private.validateBody(data);
   return validatedData;
+}
+
+export async function getQueryFile(
+    fileName: string
+): Promise<Blob> {
+
+  const request: RequestInit = {
+    method: 'GET'
+  };
+  const response = await Server.makeRequest(`/jupyterlab-sql/history?fileName=${encodeURIComponent(fileName)}`, request);
+  return await response.blob();
 }
 
 export interface QueryMetaData {

@@ -174,7 +174,7 @@ class HistoryHandler(IPythonHandler):
 
     def execute_history_query(self, connection_url):
         metadata_connection_url = "sqlite:///metadata.db"
-        history_query = f'SELECT id, query, ts, connectionUrl from metadata WHERE connectionUrl = "{connection_url}"'
+        history_query = f'SELECT id, query, ts, connectionUrl from metadata WHERE connectionUrl = "{connection_url}" ORDER BY ts DESC'
         result = self._executor.execute_query(metadata_connection_url, history_query)
         return result
 
@@ -184,7 +184,7 @@ class HistoryHandler(IPythonHandler):
         connection_url = None
         for k, v in filters.items():
             if k == 'fileName':
-                requested_file_name = v
+                requested_file_name = v[0].decode("utf-8")
             if k == 'connectionUrl':
                 print(f'ConnectionUrl parameter received is {type(v)}')
                 connection_url = v[0].decode("utf-8")
