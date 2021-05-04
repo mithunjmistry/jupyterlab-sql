@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { IDisposable } from '@phosphor/disposable';
+import { IDisposable } from '@lumino/disposable';
 
 import * as History from '../api/history';
 
@@ -25,7 +25,7 @@ export class QueryHistoryModel extends VDomModel
 
 export class QueryHistoryWidget extends VDomRenderer<QueryHistoryModel> {
   constructor() {
-    super();
+    super(undefined);
     this.addClass('p-Sql-DatabaseSummary-Container');
   }
 

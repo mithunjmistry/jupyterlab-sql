@@ -3,7 +3,7 @@ import { URLExt } from '@jupyterlab/coreutils';
 import { ServerConnection } from '@jupyterlab/services';
 
 export namespace Server {
-  const settings = ServerConnection.defaultSettings;
+  const settings = ServerConnection.makeSettings();
 
   export async function makeRequest(
     endpoint: string,

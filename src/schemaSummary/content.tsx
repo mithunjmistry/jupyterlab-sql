@@ -2,9 +2,9 @@ import * as React from 'react';
 
 import classNames from 'classnames';
 
-import { IDisposable } from '@phosphor/disposable';
+import { IDisposable } from '@lumino/disposable';
 
-import { Signal, ISignal } from '@phosphor/signaling';
+import { Signal, ISignal } from '@lumino/signaling';
 
 import { VDomModel, VDomRenderer } from '@jupyterlab/apputils';
 
@@ -34,7 +34,7 @@ export class SchemaSummaryModel extends VDomModel
 
 export class SchemaSummaryWidget extends VDomRenderer<SchemaSummaryModel> {
   constructor() {
-    super();
+    super(undefined);
     this.addClass('p-Sql-SchemaSummary-Container');
   }
 
