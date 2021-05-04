@@ -1,6 +1,6 @@
-import {BoxLayout, Widget} from '@phosphor/widgets';
+import { Widget, BoxLayout } from '@lumino/widgets';
 
-import {ISignal, Signal} from '@phosphor/signaling';
+import { ISignal, Signal } from '@lumino/signaling';
 
 import {IEditorFactoryService} from '@jupyterlab/codeeditor';
 

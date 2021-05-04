@@ -106,6 +106,7 @@ class QueryHistoryListItem extends React.Component<QueryHistoryListItem.Props> {
   constructor(props: QueryHistoryListItem.Props) {
     super(props);
     this.onQueryDownload = this.onQueryDownload.bind(this);
+    this.tsToHumanReadableDate = this.tsToHumanReadableDate.bind(this);
   }
 
   onQueryDownload(ts: number, downloadType: string) {
@@ -125,9 +126,22 @@ class QueryHistoryListItem extends React.Component<QueryHistoryListItem.Props> {
     })
   }
 
+  tsToHumanReadableDate(ts: number) {
+    const d = new Date(ts * 1000);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const year = d.getFullYear();
+    const month = months[d.getMonth()];
+    const date = d.getDate();
+    const hour = d.getHours();
+    const min = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+    const sec = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds();
+    return `${date} ${month} ${year} ${hour}:${min}:${sec}`
+  }
+
   render() {
     const { queryMetaData } = this.props;
     const { query, ts } = queryMetaData;
+    const time = this.tsToHumanReadableDate(ts);
     return (
       <li
         title={query}
@@ -138,6 +152,7 @@ class QueryHistoryListItem extends React.Component<QueryHistoryListItem.Props> {
             {format(query, {language: 'spark'})}
           </div>
         </div>
+        <p className={"p-Query-History-Time"}>Executed on {time} UTC</p>
         <span
             className="jp-DirListing-itemText p-Query-History-Download-Input"
             onClick={() => this.onQueryDownload(ts, 'in')}
