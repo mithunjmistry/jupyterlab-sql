@@ -2,7 +2,7 @@ import json
 from contextlib import contextmanager
 
 from jupyter_server.utils import url_path_join
-from jupyter_server.base.handlers import JupyterHandler
+from jupyter_server.base.handlers import APIHandler
 import tornado.ioloop
 
 from . import responses
@@ -14,7 +14,7 @@ import os
 import pandas as pd
 
 
-class SqlQueryHandler(JupyterHandler):
+class SqlQueryHandler(APIHandler):
     def initialize(self, executor):
         self._executor = executor
         self._validator = schema_loader.load("sql-query.json")
@@ -100,7 +100,7 @@ class SqlQueryHandler(JupyterHandler):
             self.finish(json.dumps(response))
 
 
-class StructureHandler(JupyterHandler):
+class StructureHandler(APIHandler):
     def initialize(self, executor):
         self._executor = executor
         self._validator = schema_loader.load("database-structure.json")
@@ -134,7 +134,7 @@ class StructureHandler(JupyterHandler):
             return self.finish(json.dumps(response))
 
 
-class SchemaStructureHandler(JupyterHandler):
+class SchemaStructureHandler(APIHandler):
     def initialize(self, executor):
         self._executor = executor
         self._validator = schema_loader.load("schema-structure.json")
@@ -168,7 +168,7 @@ class SchemaStructureHandler(JupyterHandler):
             return self.finish(json.dumps(response))
 
 
-class HistoryHandler(JupyterHandler):
+class HistoryHandler(APIHandler):
     def initialize(self, executor):
         self._executor = executor
 
@@ -218,7 +218,7 @@ class HistoryHandler(JupyterHandler):
             self.finish()
 
 
-class TableStructureHandler(JupyterHandler):
+class TableStructureHandler(APIHandler):
     def initialize(self, executor):
         self._executor = executor
         self._validator = schema_loader.load("table-structure.json")

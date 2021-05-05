@@ -1,3 +1,5 @@
+@import url('base.css');
+
 .p-Sql-MainContainer {
     padding-left: 10px;
     padding-right: 10px;
@@ -153,9 +155,4 @@
     padding-left: 20px;
     cursor: pointer;
     color: #525252;
-}
-
-.p-Query-History-Time {
-    padding-left: 5px;
-    margin-bottom: 1px;
 }
