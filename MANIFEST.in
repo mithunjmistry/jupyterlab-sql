@@ -1,2 +1,15 @@
 recursive-include labextension *.*
 include LICENSE.txt
+include pyproject.toml
+include package.json
+include install.json
+include ts*.json
+
+graft jupyterlab_sql/labextension
+
+graft src
+graft style
+prune **/node_modules
+prune lib
+
+global-exclude *~

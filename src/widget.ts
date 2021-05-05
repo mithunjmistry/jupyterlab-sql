@@ -19,6 +19,7 @@ import {SchemaSummaryPage} from './schemaSummary';
 import {TableSummaryPage} from './tableSummary';
 
 import {JupyterLabSqlPage, PageName} from './page';
+
 import {QueryHistoryPage} from "./queryHistory";
 
 namespace JupyterLabSqlWidget {

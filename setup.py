@@ -91,7 +91,7 @@ class BuildJsExtension(setuptools.Command):
 
         log.info("Building jupyterlab-sql.")
         check_call(
-            ["npm", "run", "build:dist"],
+            ["npm", "run", "build:prod"],
             cwd=str(NODE_ROOT),
             stdout=sys.stdout,
             stderr=sys.stderr,

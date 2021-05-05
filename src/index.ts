@@ -30,6 +30,7 @@ function activate(
   const tracker: WidgetTracker<JupyterLabSqlWidget> = createTracker();
   const command: string = 'jupyterlab-sql:open';
 
+  // @ts-ignore
   restorer.restore(tracker, {
     command,
     args: widget => ({

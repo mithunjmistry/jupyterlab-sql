@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "composite": true,
+    "composite": false,
     "declaration": true,
     "esModuleInterop": true,
     "incremental": true,
@@ -19,8 +19,8 @@
     "strictNullChecks": false,
     "target": "es2017",
     "types": [
-      "node"
+      "jest"
     ]
   },
-  "include": ["src/*", "src/**/*"]
+  "include": ["src/*"]
 }

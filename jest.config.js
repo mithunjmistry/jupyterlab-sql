@@ -7,7 +7,7 @@ module.exports = {
      "/node_modules/(?!@jupyterlab).+\\.js$"
   ],
   "testRegex": "(/__tests__/src/.*|(\\.|/)(test|spec))\\.tsx?$",
-  "testPathIgnorePatterns": ["<rootDir>/node_modules/"],
+  "testPathIgnorePatterns": ["<rootDir>/node_modules/", "/jupyterlab_sql/"],
   "moduleFileExtensions": [
     "ts",
     "tsx",
